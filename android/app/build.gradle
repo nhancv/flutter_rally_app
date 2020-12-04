@@ -1,0 +1,109 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+// Default debug keystore info
+def keyAliasDefault = 'androiddebugkey'
+def keyPasswordDefault = 'android'
+def storePasswordDefault = 'android'
+def storeFileDefault = 'keystores/keystore-debug.jks'
+
+// Load a specific properties file to access the keystore if exists
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = file('../key.properties')
+if (keystorePropertiesFile.exists()) {
+    println "Apply key.properties file"
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    // Load keystore properties from environment or set their default values
+    println "key.properties file was not found. Use env or default value instead."
+    def env = System.getenv()
+    if (env['ANDROID_KEY_ALIAS']) keystoreProperties.put('keyAlias', env['ANDROID_KEY_ALIAS'])
+    else keystoreProperties.put('keyAlias', keyAliasDefault)
+    if (env['ANDROID_KEY_PASSWORD']) keystoreProperties.put('keyPassword', env['ANDROID_KEY_PASSWORD'])
+    else keystoreProperties.put('keyPassword', keyPasswordDefault)
+    if (env['ANDROID_STORE_PASSWORD']) keystoreProperties.put('storePassword', env['ANDROID_STORE_PASSWORD'])
+    else keystoreProperties.put('storePassword', storePasswordDefault)
+    if (env['ANDROID_STORE_FILE']) keystoreProperties.put('storeFile', env['ANDROID_STORE_FILE'])
+    else keystoreProperties.put('storeFile', storeFileDefault)
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    compileSdkVersion 29
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.app.rally"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    signingConfigs {
+        debug {
+            keyAlias keyAliasDefault
+            keyPassword keyPasswordDefault
+            storePassword storePasswordDefault
+            storeFile file(storeFileDefault)
+        }
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storePassword keystoreProperties['storePassword']
+            storeFile file(keystoreProperties['storeFile'])
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
+        release {
+            debuggable false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
