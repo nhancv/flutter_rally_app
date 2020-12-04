@@ -36,8 +36,8 @@ class AccountSet {
 
   int get length => _accounts.length;
 
-  double get total =>
-      _accounts.fold(0.0, (double prev, AccountModel account) => prev + account.balance);
+  double get total => _accounts.fold(
+      0.0, (double prev, AccountModel account) => prev + account.balance);
 
   String get formattedTotal => '\$${total.toStringAsFixed(2)}';
 

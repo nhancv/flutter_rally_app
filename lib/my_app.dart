@@ -114,5 +114,4 @@ class _MyAppState extends State<MyApp> {
       navigatorObservers: <NavigatorObserver>[appRoute.routeObserver],
     );
   }
-
 }
