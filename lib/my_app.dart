@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:rally/generated/l10n.dart';
 import 'package:rally/pages/home/home_provider.dart';
 import 'package:rally/pages/login/login_provider.dart';
+import 'package:rally/rally/app.dart';
 import 'package:rally/services/app/app_dialog.dart';
 import 'package:rally/services/app/app_loading.dart';
 import 'package:rally/services/cache/credential.dart';
@@ -55,7 +56,8 @@ Future<void> myMain() async {
                   context.read<Credential>(),
                 )),
       ],
-      child: const MyApp(),
+      // child: const MyApp(),
+      child: RallyApp(),
     ),
   );
 }
