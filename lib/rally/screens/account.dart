@@ -5,13 +5,19 @@ import 'package:flutter/material.dart';
 
 class AccountScreen extends StatefulWidget {
 
+	const AccountScreen({
+		Key key,
+		@required this.account,
+		@required this.heroTagTitle,
+	}) : super(key: key);
+
 	static Route<dynamic> route(BuildContext context, AccountModel account, String heroTagTitle) {
-		final mediaQuery = MediaQuery.of(context);
-		final box = context.findRenderObject() as RenderBox;
-		final sourceRect = box.localToGlobal(Offset.zero) & box.size;
-		final destRect = Offset.zero & mediaQuery.size;
-		final sourceRelRect = RelativeRect.fromRect(sourceRect, destRect);
-		final destRelRect = RelativeRect.fromSize(destRect, destRect.size);
+		final MediaQueryData mediaQuery = MediaQuery.of(context);
+		final RenderBox box = context.findRenderObject() as RenderBox;
+		final Rect sourceRect = box.localToGlobal(Offset.zero) & box.size;
+		final Rect destRect = Offset.zero & mediaQuery.size;
+		final RelativeRect sourceRelRect = RelativeRect.fromRect(sourceRect, destRect);
+		final RelativeRect destRelRect = RelativeRect.fromSize(destRect, destRect.size);
 		return PageRouteBuilder<dynamic>(
 			pageBuilder: (BuildContext context, _, __) {
 				return AccountScreen(
@@ -20,12 +26,12 @@ class AccountScreen extends StatefulWidget {
 				);
 			},
 			transitionsBuilder: (BuildContext context, Animation<double> animation, _, Widget child) {
-				Animation<RelativeRect> pos = RelativeRectTween(
+				final Animation<RelativeRect> pos = RelativeRectTween(
 					begin: sourceRelRect,
 					end: destRelRect,
 				).animate(CurvedAnimation(parent: animation, curve: Curves.fastOutSlowIn));
-				Animation<double> fade = CurvedAnimation(parent: animation,
-					curve: Interval(0.0, 0.3, curve: Curves.ease),
+				final Animation<double> fade = CurvedAnimation(parent: animation,
+					curve: const Interval(0.0, 0.3, curve: Curves.ease),
 				);
 				return FadeTransition(
 					opacity: fade,
@@ -43,12 +49,6 @@ class AccountScreen extends StatefulWidget {
 		);
 	}
 
-	const AccountScreen({
-		Key key,
-		@required this.account,
-		@required this.heroTagTitle,
-	}) : super(key: key);
-
 	final AccountModel account;
 	final String heroTagTitle;
 
@@ -59,7 +59,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
 	@override
 	Widget build(BuildContext context) {
-		final theme = Theme.of(context);
+		final ThemeData theme = Theme.of(context);
 		return BackgroundWidget(
 			child: CustomScrollView(
 				slivers: <Widget>[
@@ -84,7 +84,7 @@ class _AccountScreenState extends State<AccountScreen> {
 						actions: <Widget>[
 							IconButton(
 								onPressed: _onSearchPressed,
-								icon: Icon(Icons.search),
+								icon: const Icon(Icons.search),
 							),
 						],
 					),
@@ -122,7 +122,7 @@ class _AccountScreenState extends State<AccountScreen> {
 				subtitle: Text('Subtitle $index'),
 			);
 		} else {
-			return Divider(
+			return const Divider(
 				height: 24.0,
 				color: Colors.black26,
 			);

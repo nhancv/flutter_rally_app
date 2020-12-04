@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 				child: Column(
 					children: <Widget>[
 						Row(
-							children: MainTab.values.map<Widget>((tab) =>
+							children: MainTab.values.map<Widget>((MainTab tab) =>
 								_Tab(
 									controller: _tabController,
 									tab: tab,
@@ -64,10 +64,10 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 									OverviewPage(
 										jumpToMainTab: _jumpToTab,
 									),
-									AccountsPage(),
-									BillsPage(),
-									StatsPage(),
-									SettingsPage(),
+									const AccountsPage(),
+									const BillsPage(),
+									const StatsPage(),
+									const SettingsPage(),
 								],
 							),
 						),
@@ -119,14 +119,14 @@ class _TabState extends State<_Tab> {
 						AnimatedBuilder(
 							animation: widget.controller.animation,
 							builder: (BuildContext context, Widget child) {
-								final pageIndex = widget.tab.index;
-								final pageOffset = widget.controller.animation.value;
+								final int pageIndex = widget.tab.index;
+								final double pageOffset = widget.controller.animation.value;
 
 								double tabVisibility;
 								if (pageOffset >= pageIndex && pageOffset < (pageIndex + 1.0)) {
 									tabVisibility = 1.0 - (pageOffset % 1.0);
 								} else if ((pageOffset + 1.0) >= pageIndex && (pageOffset + 1.0) < (pageIndex + 1.0)) {
-									tabVisibility = (pageOffset % 1.0);
+									tabVisibility = pageOffset % 1.0;
 								} else {
 									tabVisibility = 0.0;
 								}
@@ -153,24 +153,25 @@ class _TabState extends State<_Tab> {
 
 	void _onTap() {
 		widget.controller.animateTo(widget.tab.index,
-			duration: Duration(milliseconds: 450), curve: Curves.fastOutSlowIn);
+			duration: const Duration(milliseconds: 450), curve: Curves.fastOutSlowIn);
 	}
 }
 
 class MainTab {
-	static const Overview = MainTab(Icons.pie_chart, 'OVERVIEW');
-	static const Accounts = MainTab(Icons.attach_money, 'ACCOUNTS');
-	static const Bills = MainTab(Icons.money_off, 'BILLS');
-	static const Stats = MainTab(Icons.equalizer, 'STATS');
-	static const Settings = MainTab(Icons.settings, 'SETTINGS');
+	const MainTab(this.icon, this.label);
 
-	static const values = <MainTab>[
+	static const MainTab Overview = MainTab(Icons.pie_chart, 'OVERVIEW');
+	static const MainTab Accounts = MainTab(Icons.attach_money, 'ACCOUNTS');
+	static const MainTab Bills = MainTab(Icons.money_off, 'BILLS');
+	static const MainTab Stats = MainTab(Icons.equalizer, 'STATS');
+	static const MainTab Settings = MainTab(Icons.settings, 'SETTINGS');
+
+	static const List<MainTab> values = <MainTab>[
 		Overview, Accounts, Bills, Stats, Settings,
 	];
 
 	int get index => values.indexOf(this);
 
-	const MainTab(this.icon, this.label);
 
 	final IconData icon;
 	final String label;

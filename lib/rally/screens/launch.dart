@@ -65,18 +65,18 @@ class _LaunchScreenState extends State<LaunchScreen> {
 												TextFormField(
 													focusNode: _usernameFocus,
 													validator: _validateRequired('Username',
-															(value) => _usernameValidated = value),
+															(bool value) => _usernameValidated = value),
 													decoration: InputDecoration(
 														suffixIcon: _buildValidationIcon(context, _usernameValidated),
 														hintText: 'Username',
 													),
 													onFieldSubmitted: _onUsernameSubmitted,
 												),
-												SizedBox(height: 16.0),
+												const SizedBox(height: 16.0),
 												TextFormField(
 													focusNode: _passwordFocus,
 													validator: _validateRequired('Password',
-															(value) => _passwordValidated = value),
+															(bool value) => _passwordValidated = value),
 													obscureText: true,
 													decoration: InputDecoration(
 														suffixIcon: _buildValidationIcon(context, _passwordValidated),
@@ -87,7 +87,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
 												Expanded(
 													child: Column(
 														mainAxisAlignment: MainAxisAlignment.center,
-														children: <Widget>[
+														children: const <Widget>[
 															Icon(Icons.fingerprint,
 																size: 72.0,
 																color: Colors.black,
@@ -103,7 +103,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
 									),
 									AnimatedSwitcher(
 										duration: const Duration(milliseconds: 450),
-										child: !_processing ? null : Center(
+										child: !_processing ? null : const Center(
 											child: CircularProgressIndicator(),
 										),
 									),
@@ -117,7 +117,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
 	}
 
 	Widget _buildValidationIcon(BuildContext context, bool validated) {
-		final theme = Theme.of(context);
+		final ThemeData theme = Theme.of(context);
 		if (validated == null) {
 			return null;
 		}
@@ -154,11 +154,11 @@ class _LaunchScreenState extends State<LaunchScreen> {
 		_onSubmitLogin();
 	}
 
-	void _onSubmitLogin() async {
+	Future<void> _onSubmitLogin() async {
 		setState(() => _processing = true);
 
 		// Pretend magic server stuff happens here
-		await Future<void>.delayed(Duration(seconds: 2));
+		await Future<void>.delayed(const Duration(seconds: 2));
 
 		if (mounted) {
 			setState(() => _processing = false);

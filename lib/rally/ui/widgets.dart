@@ -12,7 +12,7 @@ class ScrollviewMax extends StatelessWidget {
 
 	@override
 	Widget build(BuildContext context) {
-		final mediaQuery = MediaQuery.of(context);
+		final MediaQueryData mediaQuery = MediaQuery.of(context);
 		return LayoutBuilder(
 			builder: (BuildContext context, BoxConstraints viewportConstraints) {
 				return SingleChildScrollView(
@@ -42,7 +42,7 @@ class BackgroundWidget extends StatelessWidget {
 
 	@override
 	Widget build(BuildContext context) {
-		final theme = Theme.of(context);
+		final ThemeData theme = Theme.of(context);
 		Widget child = this.child;
 		if (theme != null) {
 			child = Theme(
@@ -125,7 +125,7 @@ class AccountListTile extends StatelessWidget {
 										fontSize: 20.0,
 									),
 								),
-								Icon(Icons.chevron_right,
+								const Icon(Icons.chevron_right,
 									color: Colors.grey,
 								),
 							],

@@ -32,8 +32,8 @@ class AccountChartLayout extends StatelessWidget {
 								child: Column(
 									mainAxisAlignment: MainAxisAlignment.center,
 									children: <Widget>[
-										Text('Total',
-											style: const TextStyle(
+										const Text('Total',
+											style: TextStyle(
 												letterSpacing: 0.8,
 											),
 										),
@@ -45,14 +45,14 @@ class AccountChartLayout extends StatelessWidget {
 												),
 											),
 										),
-										Icon(Icons.info_outline, color: Colors.grey),
+										const Icon(Icons.info_outline, color: Colors.grey),
 									],
 								),
 							),
 						)
 					),
 				),
-				SliverToBoxAdapter(
+				const SliverToBoxAdapter(
 					child: Divider(
 						color: Colors.black26,
 					),
@@ -75,7 +75,7 @@ class AccountChartLayout extends StatelessWidget {
 		} else if (index.isEven) {
 			return builder(context, itemIndex);
 		} else {
-			return Divider(
+			return const Divider(
 				height: 24.0,
 				color: Colors.black26,
 			);
