@@ -5,6 +5,7 @@ import 'package:rally/generated/l10n.dart';
 import 'package:rally/pages/home/home_provider.dart';
 import 'package:rally/pages/login/login_provider.dart';
 import 'package:rally/rally/app.dart';
+import 'package:rally/rally/rally_provider.dart';
 import 'package:rally/services/app/app_dialog.dart';
 import 'package:rally/services/app/app_loading.dart';
 import 'package:rally/services/cache/credential.dart';
@@ -17,6 +18,7 @@ import 'package:rally/utils/app_route.dart';
 import 'package:rally/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:rally/rally/theme.dart' as RallyTheme;
 
 Future<void> myMain() async {
   /// Start services later
@@ -61,8 +63,7 @@ Future<void> myMain() async {
                   context.read<Credential>(),
                 )),
       ],
-      // child: const MyApp(),
-      child: RallyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -94,7 +95,7 @@ class _MyAppState extends State<MyApp> {
     // Get providers
     final AppRoute appRoute = context.watch<AppRoute>();
     final LocaleProvider localeProvider = context.watch<LocaleProvider>();
-    final AppTheme appTheme = context.theme();
+    // final AppTheme appTheme = context.theme();
     // Build Material app
     return MaterialApp(
       navigatorKey: appRoute.navigatorKey,
@@ -107,7 +108,8 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       debugShowCheckedModeBanner: false,
-      theme: appTheme.buildThemeData(),
+      // theme: appTheme.buildThemeData(),
+      theme: RallyTheme.AppTheme.theme, // rally theme
       //https://stackoverflow.com/questions/57245175/flutter-dynamic-initial-route
       //https://github.com/flutter/flutter/issues/12454
       //home: (appRoute.generateRoute(

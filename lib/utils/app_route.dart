@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:rally/pages/counter/counter_page.dart';
-import 'package:rally/pages/home/home_page.dart';
-import 'package:rally/pages/login/login_page.dart';
-import 'package:rally/utils/app_constant.dart';
 import 'package:provider/provider.dart';
+import 'package:rally/pages/counter/counter_page.dart';
+import 'package:rally/rally/screens/launch.dart';
+import 'package:rally/rally/screens/main.dart';
+import 'package:rally/utils/app_constant.dart';
 
 class AppRoute {
   /// App global navigator key
@@ -27,13 +27,17 @@ class AppRoute {
 
       case AppConstant.homePageRoute:
         return MaterialPageRoute<dynamic>(
-            settings: settings, builder: (_) => const HomePage());
+            // settings: settings, builder: (_) => const HomePage());
+            settings: settings,
+            builder: (_) => MainScreen());
 
       case AppConstant.loginPageRoute:
       case AppConstant.rootPageRoute:
       default:
         return MaterialPageRoute<dynamic>(
-            settings: settings, builder: (_) => const LoginPage());
+            // settings: settings, builder: (_) => const LoginPage());
+            settings: settings,
+            builder: (_) => LaunchScreen());
     }
   }
 }
