@@ -33,7 +33,7 @@ class Api {
 
     if (token != null) {
       options.headers.addAll(
-          <String, String>{'Authorization': 'Bearer ${token.accessToken}'});
+          <String, String>{'Authorization': 'Bearer ${token.user}'});
     }
 
     return options;

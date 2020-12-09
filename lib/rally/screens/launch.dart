@@ -1,19 +1,27 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rally/rally/assets.dart';
+import 'package:rally/rally/rally_provider.dart';
 import 'package:rally/rally/screens/main.dart';
 import 'package:rally/rally/theme.dart';
 import 'package:rally/rally/ui/widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:rally/services/app/app_dialog.dart';
+import 'package:rally/services/rest_api/api_error.dart';
+import 'package:rally/services/rest_api/api_error_type.dart';
+import 'package:rally/services/safety/base_stateful.dart';
 
 class LaunchScreen extends StatefulWidget {
   @override
   _LaunchScreenState createState() => _LaunchScreenState();
 }
 
-class _LaunchScreenState extends State<LaunchScreen> {
+class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   FocusNode _usernameFocus;
   FocusNode _passwordFocus;
   FocusNode _submitFocus;
@@ -22,6 +30,18 @@ class _LaunchScreenState extends State<LaunchScreen> {
   bool _passwordValidated;
 
   bool _processing = false;
+
+  RallyProvider _rallyProvider;
+
+  @override
+  void initDependencies(BuildContext context) {
+    _rallyProvider = Provider.of<RallyProvider>(context, listen: false);
+  }
+
+  @override
+  void afterFirstBuild(BuildContext context) {
+    _rallyProvider.resetState();
+  }
 
   @override
   void initState() {
@@ -41,6 +61,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BackgroundWidget(
       theme: AppTheme.loginTheme,
       child: Form(
@@ -64,6 +85,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
                           ),
                         ),
                         TextFormField(
+                          controller: _usernameController,
                           focusNode: _usernameFocus,
                           validator: _validateRequired('Username',
                               (bool value) => _usernameValidated = value),
@@ -76,6 +98,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
                         ),
                         const SizedBox(height: 16.0),
                         TextFormField(
+                          controller: _passwordController,
                           focusNode: _passwordFocus,
                           validator: _validateRequired('Password',
                               (bool value) => _passwordValidated = value),
@@ -160,12 +183,22 @@ class _LaunchScreenState extends State<LaunchScreen> {
   Future<void> _onSubmitLogin() async {
     setState(() => _processing = true);
 
-    // Pretend magic server stuff happens here
-    await Future<void>.delayed(const Duration(seconds: 2));
+    final bool success = await apiCallSafety(() {
+      return _rallyProvider.login(
+          _usernameController.text, _passwordController.text);
+    });
 
     if (mounted) {
       setState(() => _processing = false);
-      Navigator.of(context).push<void>(MainScreen.route());
+      if (success) {
+        Navigator.of(context).push<void>(MainScreen.route());
+      }
     }
+  }
+
+  @override
+  Future<void> onApiError(dynamic error) async {
+    final ApiErrorType errorType = parseApiErrorType(error);
+    AppDialogProvider.show(context, errorType.message);
   }
 }

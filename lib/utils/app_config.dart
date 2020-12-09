@@ -7,7 +7,7 @@ class Env {
 
   /// Dev mode
   factory Env.dev() {
-    return Env._(apiBaseUrl: 'https://nhancv.free.beeceptor.com');
+    return Env._(apiBaseUrl: 'https://dev-6782369.okta.com/api');
   }
 
   final String apiBaseUrl;

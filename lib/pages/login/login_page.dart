@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rally/generated/l10n.dart';
-import 'package:rally/models/remote/login_response.dart';
 import 'package:rally/pages/login/login_provider.dart';
 import 'package:rally/services/app/app_dialog.dart';
 import 'package:rally/services/app/app_loading.dart';
@@ -12,7 +12,6 @@ import 'package:rally/utils/app_log.dart';
 import 'package:rally/utils/app_route.dart';
 import 'package:rally/widgets/p_appbar_transparency.dart';
 import 'package:rally/widgets/w_dismiss_keyboard.dart';
-import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -128,20 +127,25 @@ class _LoginPageState extends State<LoginPage>
                 onPressed: context
                         .select((LoginProvider provider) => provider.formValid)
                     ? () async {
-                        final bool success = await apiCallSafety(provider.login,
-                            onStart: () async {
-                          AppLoadingProvider.show(context);
-                        }, onCompleted: (bool status, bool res) async {
-                          AppLoadingProvider.hide(context);
-                        }, onError: (dynamic error) async {
-                          final ApiErrorType errorType =
-                              parseApiErrorType(error);
-                          AppDialogProvider.show(
-                            context,
-                            errorType.message,
-                            title: 'Error',
-                          );
-                        }, skipOnError: false);
+                        final bool success = await apiCallSafety(
+                          provider.login,
+                          onStart: () async {
+                            AppLoadingProvider.show(context);
+                          },
+                          onCompleted: (bool status, bool res) async {
+                            AppLoadingProvider.hide(context);
+                          },
+                          onError: (dynamic error) async {
+                            final ApiErrorType errorType =
+                                parseApiErrorType(error);
+                            AppDialogProvider.show(
+                              context,
+                              errorType.message,
+                              title: 'Error',
+                            );
+                          },
+                          skipOnError: true,
+                        );
                         if (success == true) {
                           context
                               .navigator()
@@ -150,47 +154,6 @@ class _LoginPageState extends State<LoginPage>
                       }
                     : null,
                 child: Text(S.of(context).btnLogin),
-              ),
-
-              // Example call api with success http code but with error response,
-              // and how to use function response data instead property approach.
-              RaisedButton(
-                key: const Key('callApiErrorBtnKey'),
-                onPressed: () async {
-                  final LoginResponse loginResponse = await apiCallSafety(
-                    provider.logInWithError,
-                    onStart: () async {
-                      AppLoadingProvider.show(context);
-                    },
-                    onCompleted: (bool status, LoginResponse res) async {
-                      AppLoadingProvider.hide(context);
-                    },
-                  );
-                  logger.d(loginResponse);
-                  if (loginResponse.error != null) {
-                    AppDialogProvider.show(
-                        context, loginResponse.error.message);
-                  }
-                },
-                child: const Text('call api with error'),
-              ),
-
-              // Example call api with exception return to ui
-              // Note: Exception make app can not hide the app loading with previous ways
-              RaisedButton(
-                key: const Key('callApiExceptionBtnKey'),
-                onPressed: () async {
-                  apiCallSafety(
-                    provider.logInWithException,
-                    onStart: () async {
-                      AppLoadingProvider.show(context);
-                    },
-                    onCompleted: (bool status, void res) async {
-                      AppLoadingProvider.hide(context);
-                    },
-                  );
-                },
-                child: const Text('call api with exception'),
               ),
 
               const SizedBox(height: 30),

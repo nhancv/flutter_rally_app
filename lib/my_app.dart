@@ -55,6 +55,11 @@ Future<void> myMain() async {
                   context.read<ApiUser>(),
                   context.read<Credential>(),
                 )),
+        ChangeNotifierProvider<RallyProvider>(
+            create: (BuildContext context) => RallyProvider(
+                  context.read<ApiUser>(),
+                  context.read<Credential>(),
+                )),
       ],
       // child: const MyApp(),
       child: RallyApp(),
