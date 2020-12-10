@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:rally/models/local/token.dart';
 import 'package:rally/services/cache/credential.dart';
 import 'package:rally/services/rest_api/api_user.dart';
@@ -27,13 +30,36 @@ class RallyProvider extends ChangeNotifierSafety {
         data['_embedded'] as Map<String, dynamic>;
     final String user = (_embedded['user'] as Map<String, dynamic>).toString();
     final Token token = Token(user: user);
-    if (token != null) {
+    // Save credential
+    final bool saveRes = await _credential.storeCredential(token, cache: true);
+    return saveRes;
+  }
+
+  // Login via OpenID
+  Future<bool> loginOpenId() async {
+    try {
+      final FlutterAppAuth appAuth = FlutterAppAuth();
+      final AuthorizationTokenResponse authResponse =
+              await appAuth.authorizeAndExchangeCode(
+            AuthorizationTokenRequest(
+              '0oa1nd3mf9SjX014I5d6',
+              'com.okta.dev-6782369:/callback',
+              issuer: 'https://dev-6782369.okta.com/oauth2/default',
+              discoveryUrl:
+                  'https://dev-6782369.okta.com/oauth2/default/.well-known/openid-configuration',
+              scopes: <String>['openid', 'profile', 'email', 'offline_access'],
+              // ignore any existing session; force interactive login prompt
+              promptValues: <String>['login'],
+              loginHint: Platform.isAndroid ? '\u0002' : null,
+            ),
+          );
+      final String accessToken = authResponse.accessToken;
+      final Token token = Token(user: accessToken);
       // Save credential
-      final bool saveRes =
-          await _credential.storeCredential(token, cache: true);
+      final bool saveRes = await _credential.storeCredential(token, cache: true);
       return saveRes;
-    } else {
-      throw DioError(error: 'Login error', type: DioErrorType.RESPONSE);
+    } catch (e) {
+      throw DioError(error: 'Error: $e', type: DioErrorType.RESPONSE);
     }
   }
 

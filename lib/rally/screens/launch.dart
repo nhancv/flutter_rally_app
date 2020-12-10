@@ -113,15 +113,22 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
                         Expanded(
                             child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const <Widget>[
-                            Icon(
+                          children: <Widget>[
+                            const Icon(
                               Icons.fingerprint,
                               size: 72.0,
                               color: Colors.black,
                             ),
-                            SizedBox(height: 8.0),
-                            Text('Or login with Touch ID'),
-                            SizedBox(height: 36.0),
+                            const SizedBox(height: 8.0),
+                            const Text('Or login with Touch ID'),
+                            const SizedBox(height: 36.0),
+                            RaisedButton(
+                              onPressed: () {
+                                _loginWithOpenId();
+                              },
+                              child: const Text('Login with OpenId'),
+                            ),
+                            const SizedBox(height: 36.0),
                           ],
                         )),
                       ],
@@ -191,7 +198,23 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
     if (mounted) {
       setState(() => _processing = false);
       if (success) {
-        Navigator.of(context).push<void>(MainScreen.route());
+        Navigator.of(context).pushReplacement<void, void>(MainScreen.route());
+      }
+    }
+  }
+
+  // Login with OpenId
+  Future<void> _loginWithOpenId() async {
+    setState(() => _processing = true);
+
+    final bool success = await apiCallSafety(() {
+      return _rallyProvider.loginOpenId();
+    });
+
+    if (mounted) {
+      setState(() => _processing = false);
+      if (success) {
+        Navigator.of(context).pushReplacement<void, void>(MainScreen.route());
       }
     }
   }
