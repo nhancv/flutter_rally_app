@@ -66,7 +66,7 @@ class _MainScreenState extends State<MainScreen>
                   const AccountsPage(),
                   const BillsPage(),
                   const StatsPage(),
-                  const SettingsPage(),
+                  SettingsPage(),
                 ],
               ),
             ),

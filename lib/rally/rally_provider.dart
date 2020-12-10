@@ -13,6 +13,8 @@ class RallyProvider extends ChangeNotifierSafety {
   // Credential
   final Credential _credential;
 
+  String get user => _api.token?.user;
+
   @override
   void resetState() {}
 
@@ -33,5 +35,18 @@ class RallyProvider extends ChangeNotifierSafety {
     } else {
       throw DioError(error: 'Login error', type: DioErrorType.RESPONSE);
     }
+  }
+
+  /// Call logout
+  Future<bool> logout() async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    if (user == null) {
+      return true;
+    }
+
+    // Save credential
+    final bool saveRes = await _credential.storeCredential(null, cache: true);
+    return saveRes;
   }
 }

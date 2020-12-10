@@ -4,6 +4,7 @@ import 'package:rally/services/app/dynamic_size.dart';
 /// Remember call super.build(context) in widget
 abstract class BaseStateful<T extends StatefulWidget> extends State<T>
     with DynamicSize {
+
   // Context valid to create providers
   @protected
   void initDependencies(BuildContext context);

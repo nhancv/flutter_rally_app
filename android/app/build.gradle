@@ -69,6 +69,9 @@ android {
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = [
+                'appAuthRedirectScheme': 'com.okta.dev-6782369'
+        ]
     }
 
     signingConfigs {
