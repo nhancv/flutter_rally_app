@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:rally/models/local/token.dart';
 import 'package:rally/services/cache/credential.dart';
 import 'package:rally/services/rest_api/api_user.dart';
@@ -69,6 +70,52 @@ class RallyProvider extends ChangeNotifierSafety {
         ),
       );
       final String accessToken = authResponse.accessToken;
+      final Token token = Token(user: accessToken);
+      // Save credential
+      final bool saveRes =
+          await _credential.storeCredential(token, cache: true);
+      return saveRes;
+    } catch (e) {
+      throw DioError(error: 'Error: $e', type: DioErrorType.RESPONSE);
+    }
+  }
+
+  // Login social
+  Future<bool> loginSocial(String idName) async {
+    // https://developer.okta.com/docs/reference/api/oidc/#authorize
+    try {
+      final Map<String, String> idps = {
+        // https://console.developers.google.com/
+        'google': '0oa2s9urd0fKsBsG15d6',
+        // https://developers.facebook.com/
+        'facebook': '0oa2se89h0ciMY7Us5d6',
+        // https://www.linkedin.com/developers/
+        'linkedin': '0oa2selzkzc1nrq4z5d6',
+      };
+
+      final Map<String, String> scopes = <String, String>{
+        // https://developers.google.com/identity/protocols/googlescopes#google_sign-in
+        'google': 'openid',
+        // https://developers.facebook.com/docs/facebook-login/permissions/v2.8
+        'facebook': 'openid',
+        // https://developer.linkedin.com/docs/fields
+        'linkedin': 'openid',
+      };
+
+      final String result = await FlutterWebAuth.authenticate(
+        url:
+            'https://dev-6782369.okta.com/oauth2/v1/authorize?idp=${idps[idName]}&client_id=0oa1nd3mf9SjX014I5d6&response_type=id_token token&response_mode=fragment&scope=${scopes[idName]}&redirect_uri=okta://com.okta.dev-6782369&state=any&nonce=any&prompt=login',
+        callbackUrlScheme: 'okta',
+      );
+
+      print('result $result');
+
+      // Extract token from resulting url
+      final Uri tokenUri = Uri.parse(result);
+      // Just for easy parsing
+      final String normalUrl = 'http://website/index.html?${tokenUri.fragment}';
+      final String accessToken =
+          Uri.parse(normalUrl).queryParameters['access_token'];
       final Token token = Token(user: accessToken);
       // Save credential
       final bool saveRes =

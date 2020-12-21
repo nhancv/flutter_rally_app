@@ -29,6 +29,7 @@ dependencies:
   # Standard library for OAuth 2.0 and OpenID Connect
   flutter_appauth: ^0.9.2+6
   flutter_web_auth: ^0.2.4
+  url_launcher: ^5.7.10
 
 flutter_intl:
   enabled: false
