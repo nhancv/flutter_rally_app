@@ -3,14 +3,21 @@ import 'package:meta/meta.dart';
 
 /// Environment declare here
 class Env {
-  Env._({@required this.apiBaseUrl});
+  Env._({
+    @required this.apiBaseUrl,
+    @required this.apiKey,
+  });
 
   /// Dev mode
   factory Env.dev() {
-    return Env._(apiBaseUrl: 'https://dev-6782369.okta.com/api');
+    return Env._(
+      apiBaseUrl: 'https://dev-6782369.okta.com',
+      apiKey: '00as7LbKEx3UUO91M-xgHWzW3mMPbn8Vga91-lQnET',
+    );
   }
 
   final String apiBaseUrl;
+  final String apiKey;
 }
 
 /// Config env

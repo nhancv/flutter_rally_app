@@ -1,16 +1,19 @@
 import 'dart:async';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rally/rally/assets.dart';
 import 'package:rally/rally/rally_provider.dart';
 import 'package:rally/rally/screens/main.dart';
+import 'package:rally/rally/screens/register.dart';
 import 'package:rally/rally/theme.dart';
 import 'package:rally/rally/ui/widgets.dart';
 import 'package:rally/services/app/app_dialog.dart';
 import 'package:rally/services/rest_api/api_error.dart';
 import 'package:rally/services/rest_api/api_error_type.dart';
 import 'package:rally/services/safety/base_stateful.dart';
+import 'package:rally/utils/app_helper.dart';
 
 class LaunchScreen extends StatefulWidget {
   @override
@@ -20,13 +23,13 @@ class LaunchScreen extends StatefulWidget {
 class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  FocusNode _usernameFocus;
+  FocusNode _emailFocus;
   FocusNode _passwordFocus;
   FocusNode _submitFocus;
 
-  bool _usernameValidated;
+  bool _emailValidated;
   bool _passwordValidated;
 
   bool _processing = false;
@@ -46,7 +49,7 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   @override
   void initState() {
     super.initState();
-    _usernameFocus = FocusNode();
+    _emailFocus = FocusNode();
     _passwordFocus = FocusNode();
     _submitFocus = FocusNode();
   }
@@ -55,94 +58,116 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   void dispose() {
     _submitFocus.dispose();
     _passwordFocus.dispose();
-    _usernameFocus.dispose();
+    _emailFocus.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return BackgroundWidget(
-      theme: AppTheme.loginTheme,
-      child: Form(
-        key: _formKey,
-        child: ScrollviewMax(
-          child: IgnorePointer(
-            ignoring: _processing,
-            child: SafeArea(
-              child: Stack(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: Center(
-                            child: Image.asset(
-                              Images.logo,
-                              width: 140.0,
+    return Scaffold(
+      body: BackgroundWidget(
+        theme: AppTheme.loginTheme,
+        child: Form(
+          key: _formKey,
+          child: ScrollviewMax(
+            child: IgnorePointer(
+              ignoring: _processing,
+              child: SafeArea(
+                child: Stack(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Center(
+                              child: Image.asset(
+                                Images.logo,
+                                width: 140.0,
+                              ),
                             ),
                           ),
-                        ),
-                        TextFormField(
-                          controller: _usernameController,
-                          focusNode: _usernameFocus,
-                          validator: _validateRequired('Username',
-                              (bool value) => _usernameValidated = value),
-                          decoration: InputDecoration(
-                            suffixIcon: _buildValidationIcon(
-                                context, _usernameValidated),
-                            hintText: 'Username',
+                          TextFormField(
+                            controller: _emailController,
+                            focusNode: _emailFocus,
+                            validator: _validateRequired(
+                                'Email', (bool value) => _emailValidated = value,
+                                isEmail: true),
+                            decoration: InputDecoration(
+                              suffixIcon:
+                              _buildValidationIcon(context, _emailValidated),
+                              hintText: 'Email',
+                            ),
+                            onFieldSubmitted: _onUsernameSubmitted,
                           ),
-                          onFieldSubmitted: _onUsernameSubmitted,
-                        ),
-                        const SizedBox(height: 16.0),
-                        TextFormField(
-                          controller: _passwordController,
-                          focusNode: _passwordFocus,
-                          validator: _validateRequired('Password',
-                              (bool value) => _passwordValidated = value),
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            suffixIcon: _buildValidationIcon(
-                                context, _passwordValidated),
-                            hintText: 'Password',
+                          const SizedBox(height: 16.0),
+                          TextFormField(
+                            controller: _passwordController,
+                            focusNode: _passwordFocus,
+                            validator: _validateRequired('Password',
+                                    (bool value) => _passwordValidated = value),
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              suffixIcon: _buildValidationIcon(
+                                  context, _passwordValidated),
+                              hintText: 'Password',
+                            ),
+                            onFieldSubmitted: _onPasswordSubmitted,
                           ),
-                          onFieldSubmitted: _onPasswordSubmitted,
-                        ),
-                        Expanded(
+                          Expanded(
                             child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            const Icon(
-                              Icons.fingerprint,
-                              size: 72.0,
-                              color: Colors.black,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                // const Icon(
+                                //   Icons.fingerprint,
+                                //   size: 72.0,
+                                //   color: Colors.black,
+                                // ),
+                                // const SizedBox(height: 8.0),
+                                // const Text('Or login with Touch ID'),
+                                // const SizedBox(height: 36.0),
+                                // RaisedButton(
+                                //   onPressed: () {
+                                //     _loginWithOpenId();
+                                //   },
+                                //   child: const Text('Login with OpenId'),
+                                // ),
+                                // const SizedBox(height: 36.0),
+                                const SizedBox(height: 36.0),
+                                RaisedButton(
+                                  onPressed: (_emailValidated == true &&
+                                      _passwordValidated == true)
+                                      ? () {
+                                    _onSubmitLogin();
+                                  }
+                                      : null,
+                                  child: const Text('Login'),
+                                ),
+                                const SizedBox(height: 36.0),
+                                FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .push<void>(RegisterScreen.route());
+                                  },
+                                  child: const Text('Register'),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 8.0),
-                            const Text('Or login with Touch ID'),
-                            const SizedBox(height: 36.0),
-                            RaisedButton(
-                              onPressed: () {
-                                _loginWithOpenId();
-                              },
-                              child: const Text('Login with OpenId'),
-                            ),
-                            const SizedBox(height: 36.0),
-                          ],
-                        )),
-                      ],
-                    ),
-                  ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 450),
-                    child: !_processing
-                        ? null
-                        : const Center(
-                            child: CircularProgressIndicator(),
                           ),
-                  ),
-                ],
+                        ],
+                      ),
+                    ),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 450),
+                      child: !_processing
+                          ? null
+                          : const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -164,9 +189,12 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   }
 
   FormFieldValidator<String> _validateRequired(
-      String fieldName, ValueSetter<bool> validated) {
+      String fieldName, ValueSetter<bool> validated,
+      {bool isEmail = false}) {
     return (String value) {
-      if (value == null || value.trim().isEmpty) {
+      if (value == null ||
+          value.trim().isEmpty ||
+          (isEmail == true && !EmailValidator.validate(value))) {
         validated(false);
         return 'Please enter $fieldName';
       } else {
@@ -184,7 +212,6 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   void _onPasswordSubmitted(String value) {
     _formKey.currentState.validate();
     FocusScope.of(context).requestFocus(_submitFocus);
-    _onSubmitLogin();
   }
 
   Future<void> _onSubmitLogin() async {
@@ -192,7 +219,7 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
 
     final bool success = await apiCallSafety(() {
       return _rallyProvider.login(
-          _usernameController.text, _passwordController.text);
+          _emailController.text, _passwordController.text);
     });
 
     if (mounted) {
@@ -216,6 +243,21 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
       if (success) {
         Navigator.of(context).pushReplacement<void, void>(MainScreen.route());
       }
+    }
+  }
+
+  // Login with OpenId
+  Future<void> _registerWithUsernamePassword() async {
+    setState(() => _processing = true);
+
+    final bool success = await apiCallSafety(() {
+      return _rallyProvider.login(
+          _emailController.text, _passwordController.text);
+    });
+
+    if (mounted) {
+      setState(() => _processing = false);
+      AppHelper.showToast(success ? 'Success' : 'Error');
     }
   }
 

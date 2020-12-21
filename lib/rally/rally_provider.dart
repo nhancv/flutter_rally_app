@@ -35,28 +35,44 @@ class RallyProvider extends ChangeNotifierSafety {
     return saveRes;
   }
 
+  /// Call api register
+  ///
+  Future<bool> register(
+      String firstName, String lastName, String email, String password) async {
+    final Response<Map<String, dynamic>> result = await _api
+        .register(firstName, lastName, email, password)
+        .timeout(const Duration(seconds: 30));
+    final Map<String, dynamic> data = result.data;
+    print('data $data');
+    if (data['id'] as String != null) {
+      return true;
+    }
+    return false;
+  }
+
   // Login via OpenID
   Future<bool> loginOpenId() async {
     try {
       final FlutterAppAuth appAuth = FlutterAppAuth();
       final AuthorizationTokenResponse authResponse =
-              await appAuth.authorizeAndExchangeCode(
-            AuthorizationTokenRequest(
-              '0oa1nd3mf9SjX014I5d6',
-              'com.okta.dev-6782369:/callback',
-              issuer: 'https://dev-6782369.okta.com/oauth2/default',
-              discoveryUrl:
-                  'https://dev-6782369.okta.com/oauth2/default/.well-known/openid-configuration',
-              scopes: <String>['openid', 'profile', 'email', 'offline_access'],
-              // ignore any existing session; force interactive login prompt
-              promptValues: <String>['login'],
-              loginHint: Platform.isAndroid ? '\u0002' : null,
-            ),
-          );
+          await appAuth.authorizeAndExchangeCode(
+        AuthorizationTokenRequest(
+          '0oa1nd3mf9SjX014I5d6',
+          'com.okta.dev-6782369:/callback',
+          issuer: 'https://dev-6782369.okta.com/oauth2/default',
+          discoveryUrl:
+              'https://dev-6782369.okta.com/oauth2/default/.well-known/openid-configuration',
+          scopes: <String>['openid', 'profile', 'email', 'offline_access'],
+          // ignore any existing session; force interactive login prompt
+          promptValues: <String>['login'],
+          loginHint: Platform.isAndroid ? '\u0002' : null,
+        ),
+      );
       final String accessToken = authResponse.accessToken;
       final Token token = Token(user: accessToken);
       // Save credential
-      final bool saveRes = await _credential.storeCredential(token, cache: true);
+      final bool saveRes =
+          await _credential.storeCredential(token, cache: true);
       return saveRes;
     } catch (e) {
       throw DioError(error: 'Error: $e', type: DioErrorType.RESPONSE);

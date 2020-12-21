@@ -32,9 +32,19 @@ class Api {
     final Options options = await getOptions(contentType: contentType);
 
     if (token != null) {
-      options.headers.addAll(
-          <String, String>{'Authorization': 'Bearer ${token.user}'});
+      options.headers
+          .addAll(<String, String>{'Authorization': 'Bearer ${token.user}'});
     }
+
+    return options;
+  }
+
+  /// Get ApiKey to header options
+  Future<Options> getApiKeyOptions({String contentType}) async {
+    final Options options = await getOptions(contentType: contentType);
+
+    final String apiKey = Config.instance.env.apiKey;
+    options.headers.addAll(<String, String>{'Authorization': 'SSWS $apiKey'});
 
     return options;
   }
