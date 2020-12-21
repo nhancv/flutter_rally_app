@@ -118,21 +118,6 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
-                              // const Icon(
-                              //   Icons.fingerprint,
-                              //   size: 72.0,
-                              //   color: Colors.black,
-                              // ),
-                              // const SizedBox(height: 8.0),
-                              // const Text('Or login with Touch ID'),
-                              // const SizedBox(height: 36.0),
-                              // RaisedButton(
-                              //   onPressed: () {
-                              //     _loginWithOpenId();
-                              //   },
-                              //   child: const Text('Login with OpenId'),
-                              // ),
-                              // const SizedBox(height: 36.0),
                               const SizedBox(height: 36.0),
                               RaisedButton(
                                 onPressed: (_emailValidated == true &&
