@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:rally/rally/assets.dart';
 import 'package:rally/rally/rally_provider.dart';
@@ -13,7 +15,10 @@ import 'package:rally/services/app/app_dialog.dart';
 import 'package:rally/services/rest_api/api_error.dart';
 import 'package:rally/services/rest_api/api_error_type.dart';
 import 'package:rally/services/safety/base_stateful.dart';
+import 'package:rally/utils/app_asset.dart';
 import 'package:rally/utils/app_helper.dart';
+import 'package:rally/utils/app_style.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LaunchScreen extends StatefulWidget {
   @override
@@ -33,6 +38,8 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   bool _passwordValidated;
 
   bool _processing = false;
+  bool _termsOfService = false;
+  bool _privacyPolicy = false;
 
   RallyProvider _rallyProvider;
 
@@ -83,10 +90,31 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
                           child: Center(
                             child: Image.asset(
                               Images.logo,
-                              width: 140.0,
+                              width: 40.0,
                             ),
                           ),
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            IconButton(
+                                icon: Image.asset(AppImages.icGoogle),
+                                onPressed: () {
+                                  loginSocial('google');
+                                }),
+                            IconButton(
+                                icon: Image.asset(AppImages.icFacebook),
+                                onPressed: () {
+                                  loginSocial('facebook');
+                                }),
+                            IconButton(
+                                icon: Image.asset(AppImages.icLinkedIn),
+                                onPressed: () {
+                                  loginSocial('linkedin');
+                                }),
+                          ],
+                        ),
+                        const SizedBox(height: 16.0),
                         TextFormField(
                           controller: _emailController,
                           focusNode: _emailFocus,
@@ -114,6 +142,80 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
                           ),
                           onFieldSubmitted: _onPasswordSubmitted,
                         ),
+                        Row(
+                          children: <Widget>[
+                            Checkbox(
+                                value: _termsOfService,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    _termsOfService = value;
+                                  });
+                                }),
+                            RichText(
+                              text: TextSpan(
+                                children: <TextSpan>[
+                                  const TextSpan(
+                                    text: 'I accept App ',
+                                  ),
+                                  TextSpan(
+                                    style: boldTextStyle(15, Colors.white),
+                                    text: 'Terms of Service',
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () async {
+                                        const String url = 'https://google.com';
+                                        if (await canLaunch(url)) {
+                                          await launch(
+                                            url,
+                                            forceSafariVC: false,
+                                          );
+                                        }
+                                      },
+                                  ),
+                                  const TextSpan(
+                                    text: '.',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Checkbox(
+                                value: _privacyPolicy,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    _privacyPolicy = value;
+                                  });
+                                }),
+                            RichText(
+                              text: TextSpan(
+                                children: <TextSpan>[
+                                  const TextSpan(
+                                    text: 'I accept App ',
+                                  ),
+                                  TextSpan(
+                                    style: boldTextStyle(15, Colors.white),
+                                    text: 'Privacy Policy',
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () async {
+                                        const String url = 'https://google.com';
+                                        if (await canLaunch(url)) {
+                                          await launch(
+                                            url,
+                                            forceSafariVC: false,
+                                          );
+                                        }
+                                      },
+                                  ),
+                                  const TextSpan(
+                                    text: '.',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -121,7 +223,9 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
                               const SizedBox(height: 36.0),
                               RaisedButton(
                                 onPressed: (_emailValidated == true &&
-                                        _passwordValidated == true)
+                                        _passwordValidated == true &&
+                                        _privacyPolicy == true &&
+                                        _termsOfService == true)
                                     ? () {
                                         _onSubmitLogin();
                                       }
@@ -228,18 +332,19 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
     }
   }
 
-  // Login with OpenId
-  Future<void> _registerWithUsernamePassword() async {
+  // Login social
+  Future<void> loginSocial(String idName) async {
     setState(() => _processing = true);
 
     final bool success = await apiCallSafety(() {
-      return _rallyProvider.login(
-          _emailController.text, _passwordController.text);
+      return _rallyProvider.loginSocial(idName);
     });
 
     if (mounted) {
       setState(() => _processing = false);
-      AppHelper.showToast(success ? 'Success' : 'Error');
+      if (success) {
+        Navigator.of(context).pushReplacement<void, void>(MainScreen.route());
+      }
     }
   }
 
