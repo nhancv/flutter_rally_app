@@ -65,109 +65,106 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      body: BackgroundWidget(
-        theme: AppTheme.loginTheme,
-        child: Form(
-          key: _formKey,
-          child: ScrollviewMax(
-            child: IgnorePointer(
-              ignoring: _processing,
-              child: SafeArea(
-                child: Stack(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        children: <Widget>[
-                          Expanded(
-                            child: Center(
-                              child: Image.asset(
-                                Images.logo,
-                                width: 140.0,
+    return BackgroundWidget(
+      theme: AppTheme.loginTheme,
+      child: Form(
+        key: _formKey,
+        child: ScrollviewMax(
+          child: IgnorePointer(
+            ignoring: _processing,
+            child: SafeArea(
+              child: Stack(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: Center(
+                            child: Image.asset(
+                              Images.logo,
+                              width: 140.0,
+                            ),
+                          ),
+                        ),
+                        TextFormField(
+                          controller: _emailController,
+                          focusNode: _emailFocus,
+                          validator: _validateRequired(
+                              'Email', (bool value) => _emailValidated = value,
+                              isEmail: true),
+                          decoration: InputDecoration(
+                            suffixIcon:
+                                _buildValidationIcon(context, _emailValidated),
+                            hintText: 'Email',
+                          ),
+                          onFieldSubmitted: _onUsernameSubmitted,
+                        ),
+                        const SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: _passwordController,
+                          focusNode: _passwordFocus,
+                          validator: _validateRequired('Password',
+                              (bool value) => _passwordValidated = value),
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            suffixIcon: _buildValidationIcon(
+                                context, _passwordValidated),
+                            hintText: 'Password',
+                          ),
+                          onFieldSubmitted: _onPasswordSubmitted,
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              // const Icon(
+                              //   Icons.fingerprint,
+                              //   size: 72.0,
+                              //   color: Colors.black,
+                              // ),
+                              // const SizedBox(height: 8.0),
+                              // const Text('Or login with Touch ID'),
+                              // const SizedBox(height: 36.0),
+                              // RaisedButton(
+                              //   onPressed: () {
+                              //     _loginWithOpenId();
+                              //   },
+                              //   child: const Text('Login with OpenId'),
+                              // ),
+                              // const SizedBox(height: 36.0),
+                              const SizedBox(height: 36.0),
+                              RaisedButton(
+                                onPressed: (_emailValidated == true &&
+                                        _passwordValidated == true)
+                                    ? () {
+                                        _onSubmitLogin();
+                                      }
+                                    : null,
+                                child: const Text('Login'),
                               ),
-                            ),
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .push<void>(RegisterScreen.route());
+                                },
+                                child: const Text('Register'),
+                              ),
+                            ],
                           ),
-                          TextFormField(
-                            controller: _emailController,
-                            focusNode: _emailFocus,
-                            validator: _validateRequired(
-                                'Email', (bool value) => _emailValidated = value,
-                                isEmail: true),
-                            decoration: InputDecoration(
-                              suffixIcon:
-                              _buildValidationIcon(context, _emailValidated),
-                              hintText: 'Email',
-                            ),
-                            onFieldSubmitted: _onUsernameSubmitted,
-                          ),
-                          const SizedBox(height: 16.0),
-                          TextFormField(
-                            controller: _passwordController,
-                            focusNode: _passwordFocus,
-                            validator: _validateRequired('Password',
-                                    (bool value) => _passwordValidated = value),
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              suffixIcon: _buildValidationIcon(
-                                  context, _passwordValidated),
-                              hintText: 'Password',
-                            ),
-                            onFieldSubmitted: _onPasswordSubmitted,
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                // const Icon(
-                                //   Icons.fingerprint,
-                                //   size: 72.0,
-                                //   color: Colors.black,
-                                // ),
-                                // const SizedBox(height: 8.0),
-                                // const Text('Or login with Touch ID'),
-                                // const SizedBox(height: 36.0),
-                                // RaisedButton(
-                                //   onPressed: () {
-                                //     _loginWithOpenId();
-                                //   },
-                                //   child: const Text('Login with OpenId'),
-                                // ),
-                                // const SizedBox(height: 36.0),
-                                const SizedBox(height: 36.0),
-                                RaisedButton(
-                                  onPressed: (_emailValidated == true &&
-                                      _passwordValidated == true)
-                                      ? () {
-                                    _onSubmitLogin();
-                                  }
-                                      : null,
-                                  child: const Text('Login'),
-                                ),
-                                const SizedBox(height: 36.0),
-                                FlatButton(
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .push<void>(RegisterScreen.route());
-                                  },
-                                  child: const Text('Register'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 450),
-                      child: !_processing
-                          ? null
-                          : const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 450),
+                    child: !_processing
+                        ? null
+                        : const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                  ),
+                ],
               ),
             ),
           ),
