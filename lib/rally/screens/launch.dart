@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:rally/rally/assets.dart';
 import 'package:rally/rally/rally_provider.dart';
@@ -16,7 +15,6 @@ import 'package:rally/services/rest_api/api_error.dart';
 import 'package:rally/services/rest_api/api_error_type.dart';
 import 'package:rally/services/safety/base_stateful.dart';
 import 'package:rally/utils/app_asset.dart';
-import 'package:rally/utils/app_helper.dart';
 import 'package:rally/utils/app_style.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -337,7 +335,7 @@ class _LaunchScreenState extends BaseStateful<LaunchScreen> with ApiError {
     setState(() => _processing = true);
 
     final bool success = await apiCallSafety(() {
-      return _rallyProvider.loginSocial(idName);
+      return _rallyProvider.loginSocial(context, idName);
     });
 
     if (mounted) {
