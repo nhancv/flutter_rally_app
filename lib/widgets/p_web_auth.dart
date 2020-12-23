@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:rally/utils/app_log.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PWebAuth extends StatefulWidget {
@@ -58,25 +59,25 @@ class _PWebAuthState extends State<PWebAuth> {
         return WebView(
           initialUrl: widget.initialUrl,
           // Fix google sign in
-          userAgent: 'Chrome/56.0.0.0 Mobile',
+          userAgent: 'Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36',
           javascriptMode: JavascriptMode.unrestricted,
           onWebViewCreated: (WebViewController webViewController) {
             _controller.complete(webViewController);
           },
           navigationDelegate: (NavigationRequest request) {
             if (request.url.startsWith(widget.redirectUri)) {
-              print('blocking navigation to $request}');
+              logger.d('blocking navigation to $request}');
               Navigator.of(context).pop<String>(request.url);
               return NavigationDecision.prevent;
             }
-            print('allowing navigation to $request');
+            logger.d('allowing navigation to $request');
             return NavigationDecision.navigate;
           },
           onPageStarted: (String url) {
-            print('Page started loading: $url');
+            logger.d('Page started loading: $url');
           },
           onPageFinished: (String url) {
-            print('Page finished loading: $url');
+            logger.d('Page finished loading: $url');
           },
           gestureNavigationEnabled: true,
         );

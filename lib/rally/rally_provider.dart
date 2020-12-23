@@ -7,6 +7,7 @@ import 'package:rally/models/local/token.dart';
 import 'package:rally/services/cache/credential.dart';
 import 'package:rally/services/rest_api/api_user.dart';
 import 'package:rally/services/safety/change_notifier_safety.dart';
+import 'package:rally/utils/app_log.dart';
 import 'package:rally/widgets/p_web_auth.dart';
 
 class RallyProvider extends ChangeNotifierSafety {
@@ -45,7 +46,7 @@ class RallyProvider extends ChangeNotifierSafety {
         .register(firstName, lastName, email, password)
         .timeout(const Duration(seconds: 30));
     final Map<String, dynamic> data = result.data;
-    print('data $data');
+    logger.d('data $data');
     if (data['id'] as String != null) {
       return true;
     }
@@ -109,7 +110,7 @@ class RallyProvider extends ChangeNotifierSafety {
       final String result = await Navigator.of(context)
           .push<String>(PWebAuth.route(authorizationUrl, redirectUri));
 
-      if(result == null) {
+      if (result == null) {
         return false;
       }
       // Extract token from resulting url
